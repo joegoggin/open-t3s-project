@@ -8,10 +8,16 @@ function startTunnel {
     if [ -z "$LT_PID" ]; then
         echo ""
 
-        lt --port $PORT &
+        LT_OUTPUT_FILE=$(mktemp)
+
+        lt --port $PORT > "$LT_OUTPUT_FILE" &
         LT_PID=$!        
 
-        sleep 1 
+        while [ ! -s "$LT_OUTPUT_FILE" ]; do
+            sleep 1
+        done
+
+        cat $LT_OUTPUT_FILE
         echo ""
         echo "Tunnel running on port $PORT ..."
         echo ""
@@ -19,6 +25,8 @@ function startTunnel {
         echo "-- Hit 'q' to quit"
         echo ""
     fi        
+
+    rm -rf $LT_OUTPUT_FILE
 }
 
 function stopTunnel {
@@ -52,9 +60,10 @@ do
     esac
 done
 
-
+#START PROGRAM
 startTunnel
 
+#HANDLE KEY EVENTS
 while :; do
     read -rsn 1 key
     
@@ -65,8 +74,6 @@ while :; do
         q)  
             stopTunnel
             break
-            ;;
-        *)  
             ;;
     esac
 done
