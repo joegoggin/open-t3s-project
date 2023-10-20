@@ -10,14 +10,16 @@ function startTunnel {
 
         LT_OUTPUT_FILE=$(mktemp)
 
-        lt --port $PORT > "$LT_OUTPUT_FILE" &
+        ngrok http $PORT --log=stdout > "$LT_OUTPUT_FILE" &
         LT_PID=$!        
 
-        while [ ! -s "$LT_OUTPUT_FILE" ]; do
+        while  ! grep -q "started tunnel" $LT_OUTPUT_FILE; do
             sleep 1
         done
 
-        cat $LT_OUTPUT_FILE
+        URL=$(grep "msg=\"started tunnel\"" $LT_OUTPUT_FILE | sed 's/.*url=//')
+
+        echo "your url is: $URL" 
         echo ""
         echo "Tunnel running on port $PORT ..."
         echo ""
