@@ -8,7 +8,7 @@ DEFAULT_PROJECT_DIR=~/Projects
 function createSession {
     cd $DEFAULT_PROJECT_DIR/$PROJECT_NAME
     tmux new-session -d -s main -n Neovim "nvim .; zsh -i" 
-    tmux new-window -d -t main: -n Tunnel "$SCRIPT_DIR/tunnel.sh; zsh -i"
+    tmux new-window -d -t main: -n Tunnel "$SCRIPT_DIR/tunnel.sh -e $DEFAULT_PROJECT_DIR/$PROJECT_NAME/packages/app/env.ts; zsh -i"
     tmux new-window -d -t main: -n Prisma "cd packages/db && yarn dev; zsh -i"
 }
 

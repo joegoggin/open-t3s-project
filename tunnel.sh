@@ -3,6 +3,22 @@
 #VARIABLES
 PORT=3000
 
+#OPTS
+while getopts :p:e: FLAGS;
+do
+    case $FLAGS in
+        e)
+            ENV_FILE=$OPTARG
+            ;;
+        p)
+            PORT=$OPTARG
+            ;;
+        ?)
+            echo "Error: -$OPTARG is not an option"
+            ;;
+    esac
+done
+
 #FUNCTIONS
 function startTunnel {
     if [ -z "$LT_PID" ]; then
@@ -17,7 +33,14 @@ function startTunnel {
             sleep 1
         done
 
+
         URL=$(grep "msg=\"started tunnel\"" $LT_OUTPUT_FILE | sed 's/.*url=//')
+
+        if [ ! -z "$ENV_FILE" ]; then
+            NEW_LINE="const tunnel = \"$URL\";"
+
+            sed -i "3c$NEW_LINE" $ENV_FILE 
+        fi
 
         echo "your url is: $URL" 
         echo ""
@@ -48,19 +71,6 @@ function restartTunnel {
 
     startTunnel
 }
-
-#OPTS
-while getopts :p: FLAGS;
-do
-    case $FLAGS in
-        p)
-            PORT=$OPTARG
-            ;;
-        ?)
-            echo "Error: -$OPTARG is not an option"
-            ;;
-    esac
-done
 
 #START PROGRAM
 startTunnel
